@@ -1,0 +1,105 @@
+#include"book_bdb.h"
+#include"myutil.h"
+#include<stdio.h>
+#include<stdlib.h>
+
+void create_book(void (*add)(book_t *)){
+    book_t *books=(book_t *)malloc(sizeof(book_t));
+
+    printf("Enter book id:"); 
+    scanf("%d",&books->bookId);
+	printf("Enter ISBN:"); 
+    scanf("%d",&books->bookISBN);
+    printf("Enter author name:"); 
+    clear_input_buffer(); 
+    scanf("%[^\n]s",books->author);
+    printf("Enter book title:"); 
+    clear_input_buffer();
+    scanf("%[^\n]s",books->bookTitle);
+    printf("Enter publication:"); 
+    clear_input_buffer();
+    scanf("%[^\n]s",books->publication);
+    printf("Enter number of copies:"); 
+    scanf("%d",&books->numOfCopies);
+    printf("Enter price:"); 
+    scanf("%lf",&books->price);
+    
+    add(books);
+    free(books);
+    
+}
+void deleteBook()
+{
+    int id=0;
+    printf("Enter book id for delete:"); 
+    scanf("%d",&id);
+    book_delete(id);
+}
+void book_edit(){
+    book_t book;
+    int id;
+    printf("Enter book id to find:"); scanf("%d",&id);
+    book_readById(&book,id);
+    
+    
+    printf("\n\n\nThe searched book(Binary File):\n");    
+
+    printf("book id:%d\n",book.bookId);
+    printf("book ISBN:%d\n",book.bookISBN);
+    printf("author name:%s\n",book.author);
+    printf("book title:%s\n",book.bookTitle);
+    printf("publication:%s\n",book.publication);
+    printf("number of copies:%d\n",book.numOfCopies);
+    printf("price:%.2lf\n\n\n",book.price);
+
+    
+    printf("Enter price(new):"); scanf("%lf",&book.price);
+    book_update(book);	
+    
+    printf("book is updated successfully.\n");
+}
+void list_books(void (*read)(book_t*, int*)){
+    book_t *books= (book_t *)malloc(20*sizeof(book_t));
+    int count = 0;
+    read(books,&count);
+    printf("\nBooks\n");
+    for(int I = 0; I < count; I++){
+        printf("%d)\n",I);
+        printf("book id:%d\n",books[I].bookId);
+        printf("author name:%s\n",books[I].author);
+        printf("book title:%s\n",books[I].bookTitle);
+        printf("publication:%s\n",books[I].publication);
+        printf("number of copies:%d\n",books[I].numOfCopies);
+        printf("price:%.2lf\n\n\n",books[I].price);
+    }
+    free(books);
+}
+
+int main(){
+    int menu;
+    do{
+        printf("\n\nPick Choice\n");
+        printf("\t1-Create book, 2-Read All,3-delete book\n");
+        printf("\t4.Edit book 0-Exit\n"); 
+        printf("Your Choice:"); scanf("%d",&menu);
+        printf("\n");
+        if(1==menu){
+             create_book(book_insert);
+        }else if(2==menu){
+             list_books(book_readAll);
+        }
+        else if(3==menu)
+        {
+            deleteBook();
+        }
+        if(4==menu)
+        {
+            book_edit();
+        }
+        else{
+            printf("Shutting down the app....\n");
+        }
+    }
+    while(((1<=menu) && (menu<=4) || 33==menu));
+	return EXIT_SUCCESS;
+}
